@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bulk News Input</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background-color: #f4f4f4;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      font-family: monospace;
+      padding: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📰 ニュース問題 一括登録ページ</h1>
+  <p>以下の形式で貼り付けて「登録する」を押してください：</p>
+  <pre>
+英文1
+日本語訳1
+英文2
+日本語訳2
+...
+  </pre>
+  <textarea id="bulkInput" placeholder="Paste headlines and translations here..."></textarea>
+  <br />
+  <button onclick="saveBulkHeadlines()">登録する</button>
+
+  <script>
+    function saveBulkHeadlines() {
+      const input = document.getElementById("bulkInput").value.trim();
+      const lines = input.split("\n").map(line => line.trim()).filter(Boolean);
+      const headlines = [];
+      for (let i = 0; i < lines.length - 1; i += 2) {
+        headlines.push({
+          text: lines[i],
+          translation: lines[i + 1]
+        });
+      }
+      localStorage.setItem("headlines", JSON.stringify(headlines));
+      alert("✅ 登録が完了しました！登録数: " + headlines.length);
+    }
+  </script>
+</body>
+</html>
