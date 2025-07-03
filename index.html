@@ -11,13 +11,17 @@
     button { font-size: 18px; margin: 5px; padding: 10px 20px; }
     .hidden { display: none; }
     .centered { text-align: center; margin: 20px; }
+    #countdown, #notice { font-size: 32px; color: red; margin-bottom: 20px; }
   </style>
 </head>
 <body>
   <div class="centered">
     <h1>Typing News Game</h1>
-    <button onclick="startGame()">Start</button>
+    <button onclick="prepareGame()">Start</button>
   </div>
+
+  <div id="notice" class="centered hidden">※ 半角モードで入力してください ※</div>
+  <div id="countdown" class="centered hidden"></div>
 
   <div id="game" class="centered hidden">
     <h2 id="headline"></h2>
@@ -40,7 +44,6 @@
     let charCount = 0;
     let mistakeCount = 0;
     let currentHeadline = null;
-    let typedHistory = [];
 
     function loadHeadlines() {
       const stored = localStorage.getItem("headlines");
@@ -52,15 +55,46 @@
       return true;
     }
 
-    function startGame() {
+    function prepareGame() {
       if (!loadHeadlines()) return;
+
+      document.querySelector("button").classList.add("hidden");
+      document.getElementById("notice").classList.remove("hidden");
+
+      setTimeout(() => {
+        document.getElementById("notice").classList.add("hidden");
+        startCountdown();
+      }, 3000);
+    }
+
+    function startCountdown() {
+      const countdown = document.getElementById("countdown");
+      countdown.classList.remove("hidden");
+
+      let time = 3;
+      countdown.innerText = time;
+
+      const timer = setInterval(() => {
+        time--;
+        if (time > 0) {
+          countdown.innerText = time;
+        } else {
+          clearInterval(timer);
+          countdown.innerText = "Start!";
+          setTimeout(() => {
+            countdown.classList.add("hidden");
+            startGame();
+          }, 1000);
+        }
+      }, 1000);
+    }
+
+    function startGame() {
       current = 0;
       charCount = 0;
       mistakeCount = 0;
-      typedHistory = [];
-      document.querySelector("button").classList.add("hidden");
       document.getElementById("game").classList.remove("hidden");
-      countdown(3); // ← ここがポイント
+      nextHeadline();
     }
 
     function nextHeadline() {
@@ -108,20 +142,6 @@
         li.innerHTML = `<strong>${h.text}</strong><br>訳: ${h.translation}<br>リンク: <a href="${h.url || "#"}" target="_blank">${h.url || "なし"}</a>`;
         reviewList.appendChild(li);
       }
-    }
-
-    // ✅ カウントダウン関数を追加
-    function countdown(seconds) {
-      const headline = document.getElementById("headline");
-      if (seconds === 0) {
-        headline.innerText = "Start!";
-        setTimeout(() => {
-          nextHeadline();
-        }, 800);
-        return;
-      }
-      headline.innerText = seconds;
-      setTimeout(() => countdown(seconds - 1), 1000);
     }
   </script>
 </body>
