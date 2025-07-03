@@ -4,24 +4,49 @@
   <meta charset="UTF-8" />
   <title>Typing News Game</title>
   <style>
-    body { font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f9f9f9; padding: 20px; }
-    input[type="text"] { font-size: 24px; padding: 10px; width: 80%; max-width: 800px; margin-bottom: 10px; }
-    .feedback span.correct { color: green; }
-    .feedback span.incorrect { color: red; }
-    button { font-size: 18px; margin: 5px; padding: 10px 20px; }
-    .hidden { display: none; }
-    .centered { text-align: center; margin: 20px; }
-    #countdown, #notice { font-size: 32px; color: red; margin-bottom: 20px; }
+    body {
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f9f9f9;
+      padding: 20px;
+    }
+    input[type="text"] {
+      font-size: 24px;
+      padding: 10px;
+      width: 80%;
+      max-width: 800px;
+      margin-bottom: 10px;
+    }
+    .feedback span.correct {
+      color: green;
+    }
+    .feedback span.incorrect {
+      color: red;
+    }
+    button {
+      font-size: 18px;
+      margin: 5px;
+      padding: 10px 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    .centered {
+      text-align: center;
+      margin: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="centered">
     <h1>Typing News Game</h1>
-    <button onclick="prepareGame()">Start</button>
+    <button onclick="startGame()">Start</button>
   </div>
-
-  <div id="notice" class="centered hidden">※ 半角モードで入力してください ※</div>
-  <div id="countdown" class="centered hidden"></div>
 
   <div id="game" class="centered hidden">
     <h2 id="headline"></h2>
@@ -52,47 +77,23 @@
         return false;
       }
       headlines = JSON.parse(stored);
+      shuffleArray(headlines);  // ランダムに並び替え
       return true;
     }
 
-    function prepareGame() {
-      if (!loadHeadlines()) return;
-
-      document.querySelector("button").classList.add("hidden");
-      document.getElementById("notice").classList.remove("hidden");
-
-      setTimeout(() => {
-        document.getElementById("notice").classList.add("hidden");
-        startCountdown();
-      }, 3000);
-    }
-
-    function startCountdown() {
-      const countdown = document.getElementById("countdown");
-      countdown.classList.remove("hidden");
-
-      let time = 3;
-      countdown.innerText = time;
-
-      const timer = setInterval(() => {
-        time--;
-        if (time > 0) {
-          countdown.innerText = time;
-        } else {
-          clearInterval(timer);
-          countdown.innerText = "Start!";
-          setTimeout(() => {
-            countdown.classList.add("hidden");
-            startGame();
-          }, 1000);
-        }
-      }, 1000);
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
     }
 
     function startGame() {
+      if (!loadHeadlines()) return;
       current = 0;
       charCount = 0;
       mistakeCount = 0;
+      document.querySelector("button").classList.add("hidden");
       document.getElementById("game").classList.remove("hidden");
       nextHeadline();
     }
