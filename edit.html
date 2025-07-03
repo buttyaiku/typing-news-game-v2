@@ -2,60 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>News Entry</title>
+  <title>News Entry - Bulk Input</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-      background-color: #f9f9f9;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px 0;
-      font-size: 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    pre {
-      background-color: #eee;
-      padding: 10px;
-      white-space: pre-wrap;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; background: #f9f9f9; }
+    input, textarea { width: 100%; padding: 10px; margin: 8px 0; font-size: 16px; }
+    button { padding: 10px 20px; margin: 10px 5px 10px 0; font-size: 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+    button:hover { background: #45a049; }
+    pre { background: #eee; padding: 10px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
-  <h1>ニュース登録ページ</h1>
-  <p>以下のフォームにニュースの見出し・翻訳・URLを入力してください。</p>
+  <h1>ニュース登録（まとめて貼り付け）</h1>
 
+  <p>以下の形式で30問をまとめて貼り付けてください（例：）</p>
+  <pre>1. UK PM resigns - 首相が辞任
+2. Heatwave hits Europe - ヨーロッパに熱波
+3. NASA plans moon base - NASAが月面基地を計画</pre>
+
+  <textarea id="bulkInput" rows="10" placeholder="ここに複数行貼り付け"></textarea>
+  <button onclick="parseBulkInput()">まとめて追加</button>
+
+  <h2>個別入力</h2>
   <label>英文（Headline）</label>
-  <input type="text" id="headline" placeholder="例: UK PM Resigns After Scandal">
-
+  <input type="text" id="headline" placeholder="例: UK PM resigns after scandal">
   <label>翻訳（Translation）</label>
   <input type="text" id="translation" placeholder="例: スキャンダルでイギリス首相が辞任">
-
   <label>リンク（URL）</label>
   <input type="text" id="url" placeholder="例: https://example.com/news">
-
   <button onclick="addEntry()">＋追加する</button>
 
   <h2>現在のデータ</h2>
   <pre id="output"></pre>
 
   <script>
-    let headlines = [];
+    let headlines = JSON.parse(localStorage.getItem("headlines") || "[]");
+
+    function displayOutput() {
+      document.getElementById("output").textContent = JSON.stringify(headlines, null, 2);
+    }
 
     function addEntry() {
       const headline = document.getElementById("headline").value.trim();
@@ -68,21 +52,27 @@
       }
 
       headlines.push({ text: headline, translation: translation, url: url });
+      localStorage.setItem("headlines", JSON.stringify(headlines, null, 2));
+      displayOutput();
 
       document.getElementById("headline").value = "";
       document.getElementById("translation").value = "";
       document.getElementById("url").value = "";
+    }
 
+    function parseBulkInput() {
+      const lines = document.getElementById("bulkInput").value.trim().split("\n");
+      for (let line of lines) {
+        const parts = line.replace(/^\d+\.\s*/, "").split(/\s+-\s+/);
+        if (parts.length === 2) {
+          headlines.push({ text: parts[0], translation: parts[1], url: "#" });
+        }
+      }
       localStorage.setItem("headlines", JSON.stringify(headlines, null, 2));
       displayOutput();
+      document.getElementById("bulkInput").value = "";
     }
 
-    function displayOutput() {
-      const saved = localStorage.getItem("headlines");
-      document.getElementById("output").textContent = saved || "まだデータがありません。";
-    }
-
-    // 初期表示
     window.onload = displayOutput;
   </script>
 </body>
