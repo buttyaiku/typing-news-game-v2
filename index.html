@@ -60,7 +60,7 @@
       typedHistory = [];
       document.querySelector("button").classList.add("hidden");
       document.getElementById("game").classList.remove("hidden");
-      nextHeadline();
+      countdown(3); // ← ここがポイント
     }
 
     function nextHeadline() {
@@ -108,6 +108,20 @@
         li.innerHTML = `<strong>${h.text}</strong><br>訳: ${h.translation}<br>リンク: <a href="${h.url || "#"}" target="_blank">${h.url || "なし"}</a>`;
         reviewList.appendChild(li);
       }
+    }
+
+    // ✅ カウントダウン関数を追加
+    function countdown(seconds) {
+      const headline = document.getElementById("headline");
+      if (seconds === 0) {
+        headline.innerText = "Start!";
+        setTimeout(() => {
+          nextHeadline();
+        }, 800);
+        return;
+      }
+      headline.innerText = seconds;
+      setTimeout(() => countdown(seconds - 1), 1000);
     }
   </script>
 </body>
