@@ -2,10 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Typing Game</title>
+  <title>Typing News Game</title>
+  <style>
+    body { font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f9f9f9; padding: 20px; }
+    input[type="text"] { font-size: 24px; padding: 10px; width: 80%; max-width: 800px; margin-bottom: 10px; }
+    .feedback span.correct { color: green; }
+    .feedback span.incorrect { color: red; }
+    button { font-size: 18px; margin: 5px; padding: 10px 20px; }
+    .hidden { display: none; }
+    .centered { text-align: center; margin: 20px; }
+  </style>
 </head>
 <body>
-  <h1>Typing Game - News Edition</h1>
-  <p>This is the game page (index.html). Will load questions from headlines.json</p>
+  <div class="centered">
+    <h1>Typing News Game</h1>
+    <button onclick="startGame()">Start</button>
+  </div>
+
+  <div id="game" class="centered hidden">
+    <h2 id="headline"></h2>
+    <input type="text" id="input" oninput="checkTyping()" autocomplete="off" />
+    <div id="feedback" class="feedback"></div>
+    <p id="status"></p>
+    <button onclick="nextHeadline()">Next</button>
+  </div>
+
+  <div id="result" class="centered hidden">
+    <h2>Result</h2>
+    <p id="final-score"></p>
+    <ul id="review-list"></ul>
+    <button onclick="location.reload()">Play Again</button>
+  </div>
+
+  <script>
+    let headlines = [];
+    let current = 0;
+    let charCount = 0;
+    let mistakeCount = 0;
+    let currentHeadline = null;
+    let typedHistory = [];
+
+    function loadHeadlines() {
+      const stored = localStorage.getItem("headlines");
+      if (!stored) {
+        alert("ニュースが登録されていません。edit.htmlで登録してください。");
+        return false;
+      }
+      headlines = JSON.parse(stored);
+      return true;
+    }
+
+    function startGame() {
+      if (!loadHeadlines()) return;
+      current = 0;
+      charCount = 0;
+      mistakeCount = 0;
+      typedHistory = [];
+      document.querySelector("button").classList.add("hidden");
+      document.getElementById("game").classList.remove("hidden");
+      nextHeadline();
+    }
+
+    function nextHeadline() {
+      if (current >= headlines.length) {
+        showResult();
+        return;
+      }
+      currentHeadline = headlines[current];
+      document.getElementById("headline").innerText = currentHeadline.text;
+      document.getElementById("input").value = "";
+      document.getElementById("feedback").innerHTML = "";
+      document.getElementById("status").innerText = `Question ${current + 1} of ${headlines.length}`;
+      current++;
+    }
+
+    function checkTyping() {
+      const input = document.getElementById("input").value;
+      const target = document.getElementById("headline").innerText;
+      let feedback = "";
+      let localMistake = 0;
+
+      for (let i = 0; i < input.length; i++) {
+        const correct = target[i] === input[i];
+        feedback += `<span class="${correct ? "correct" : "incorrect"}">${input[i] || ""}</span>`;
+        if (!correct) localMistake++;
+      }
+
+      charCount = input.length;
+      mistakeCount = localMistake;
+      document.getElementById("feedback").innerHTML = feedback;
+    }
+
+    function showResult() {
+      document.getElementById("game").classList.add("hidden");
+      document.getElementById("result").classList.remove("hidden");
+
+      const correct = charCount - mistakeCount;
+      const score = Math.max(0, ((correct * 10 - mistakeCount * 5) / charCount)).toFixed(1);
+      document.getElementById("final-score").innerText = `Score: ${score}`;
+
+      const reviewList = document.getElementById("review-list");
+      reviewList.innerHTML = "";
+      for (let h of headlines) {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${h.text}</strong><br>訳: ${h.translation}<br>リンク: <a href="${h.url || "#"}" target="_blank">${h.url || "なし"}</a>`;
+        reviewList.appendChild(li);
+      }
+    }
+  </script>
 </body>
 </html>
