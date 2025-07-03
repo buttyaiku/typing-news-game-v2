@@ -2,10 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Edit Headlines</title>
+  <title>News Entry</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px 0;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    pre {
+      background-color: #eee;
+      padding: 10px;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-  <h1>News Entry Page</h1>
-  <p>This is a placeholder for the edit.html. You'll be able to input headlines, translations, and URLs.</p>
+  <h1>ニュース登録ページ</h1>
+  <p>以下のフォームにニュースの見出し・翻訳・URLを入力してください。</p>
+
+  <label>英文（Headline）</label>
+  <input type="text" id="headline" placeholder="例: UK PM Resigns After Scandal">
+
+  <label>翻訳（Translation）</label>
+  <input type="text" id="translation" placeholder="例: スキャンダルでイギリス首相が辞任">
+
+  <label>リンク（URL）</label>
+  <input type="text" id="url" placeholder="例: https://example.com/news">
+
+  <button onclick="addEntry()">＋追加する</button>
+
+  <h2>現在のデータ</h2>
+  <pre id="output"></pre>
+
+  <script>
+    let headlines = [];
+
+    function addEntry() {
+      const headline = document.getElementById("headline").value.trim();
+      const translation = document.getElementById("translation").value.trim();
+      const url = document.getElementById("url").value.trim();
+
+      if (!headline || !translation || !url) {
+        alert("すべての項目を入力してください");
+        return;
+      }
+
+      headlines.push({ text: headline, translation: translation, url: url });
+
+      document.getElementById("headline").value = "";
+      document.getElementById("translation").value = "";
+      document.getElementById("url").value = "";
+
+      localStorage.setItem("headlines", JSON.stringify(headlines, null, 2));
+      displayOutput();
+    }
+
+    function displayOutput() {
+      const saved = localStorage.getItem("headlines");
+      document.getElementById("output").textContent = saved || "まだデータがありません。";
+    }
+
+    // 初期表示
+    window.onload = displayOutput;
+  </script>
 </body>
 </html>
