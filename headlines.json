@@ -1,0 +1,12 @@
+[
+  {
+    "text": "Example headline one",
+    "translation": "見出しその1の翻訳",
+    "url": "https://example.com/article1"
+  },
+  {
+    "text": "Example headline two",
+    "translation": "見出しその2の翻訳",
+    "url": "https://example.com/article2"
+  }
+]
